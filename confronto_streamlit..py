@@ -31,8 +31,8 @@ def esegui_confronto(df1, df2, nome1, nome2):
     df1.columns = ['A', 'B', 'C', 'D', 'E']
     df2.columns = ['A', 'B', 'C', 'D', 'E']
     
-    # Unisci i due file sulla colonna 'A' (che rappresenta il 'codice'), mantenendo tutti i prodotti
-    comparison_df = pd.merge(df1, df2, on="A", how="outer", suffixes=(f'_{nome1}', f'_{nome2}'))
+    # Unisci i due file solo sui prodotti comuni (INNER JOIN)
+    comparison_df = pd.merge(df1, df2, on="A", how="inner", suffixes=(f'_{nome1}', f'_{nome2}'))
     
     # Identifica le differenze
     def identify_differences(row):
