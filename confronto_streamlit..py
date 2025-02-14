@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 from io import BytesIO
 
-# Titolo e scelta del tipo di confronto
 st.title("Strumento di Confronto Excel")
 st.write("Seleziona il tipo di confronto che desideri effettuare:")
 
@@ -32,8 +31,8 @@ def esegui_confronto(df1, df2, nome1, nome2):
     df1.columns = ['A', 'B', 'C', 'D', 'E']
     df2.columns = ['A', 'B', 'C', 'D', 'E']
     
-    # Unisci i due file sulla colonna 'A' (che rappresenta il 'codice')
-    comparison_df = pd.merge(df1, df2, on="A", suffixes=(f'_{nome1}', f'_{nome2}'))
+    # Unisci i due file sulla colonna 'A' (che rappresenta il 'codice'), mantenendo tutti i prodotti
+    comparison_df = pd.merge(df1, df2, on="A", how="outer", suffixes=(f'_{nome1}', f'_{nome2}'))
     
     # Identifica le differenze
     def identify_differences(row):
@@ -45,14 +44,12 @@ def esegui_confronto(df1, df2, nome1, nome2):
         if row[f'E_{nome1}'] != row[f'E_{nome2}']:  # Colonna E per Uscita
             differences.append('Uscita')
         return ", ".join(differences)
-    
+
+    # Applica la funzione di confronto
     comparison_df['Confronto'] = comparison_df.apply(identify_differences, axis=1)
     
-    # Filtra solo le righe con differenze
-    differences_df = comparison_df[comparison_df['Confronto'] != ""]
-    
-    # Seleziona le colonne necessarie per l'output
-    result_df = differences_df[['A', f'B_{nome1}', f'C_{nome1}', f'C_{nome2}', f'D_{nome1}', f'D_{nome2}', f'E_{nome1}', f'E_{nome2}', 'Confronto']]
+    # Seleziona tutte le righe, anche quelle senza differenze
+    result_df = comparison_df[['A', f'B_{nome1}', f'C_{nome1}', f'C_{nome2}', f'D_{nome1}', f'D_{nome2}', f'E_{nome1}', f'E_{nome2}', 'Confronto']]
     
     # Rinomina le colonne per maggiore chiarezza
     result_df.columns = ['Codice', 'Descrizione', f'Net ({nome1})', f'Net ({nome2})', f'Cessione ({nome1})', f'Cessione ({nome2})', f'Uscita ({nome1})', f'Uscita ({nome2})', 'Confronto']
